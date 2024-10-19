@@ -22,6 +22,11 @@ and output the results to the
 file `/tmp/v-all.txt`, use
 `perl runjob.pl 4 --ray vamos.txt /tmp/v`.
 
+## Results for N=6
+
+A partial list of 360 billion extremal submodular functions for N=6 is available at
+https://zenodo.org/records/13954788 .
+
 ## Files
 
 `ax<N>.c` -  p-standardized submodular inequalities in C structure for base set
