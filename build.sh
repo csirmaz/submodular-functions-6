@@ -19,6 +19,7 @@
 # You should have received a copy of the GNU General Public License along with
 # this program.  If not, see <https://www.gnu.org/licenses/>.
 
+mkdir bin
 for n in 4 5 6; do
 gcc -O3 -o bin/iter$n -D RANK=$n iterate.c bitmap.c
 gcc -O3 -o bin/neig$n -D RANK=$n neig.c bitmap.c
