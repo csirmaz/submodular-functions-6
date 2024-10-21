@@ -128,7 +128,7 @@ sub parse_axname {
 
     $txt =~ s/.*\#(\d+)\s+//;
     my $axno = $1;
-    if ($axno ! = $n) { die "wrong number: needed: $n, got: $axno\n"; }
+    if ($axno != $n) { die "wrong number: needed: $n, got: $axno\n"; }
     if ($txt =~ /^f\(\{([\d,\s]+)\}\) \+ f\(\{([\d,\s]+)\}\)/) {
         my ($v1, $v2) = ($1, $2);
         $v1 = bitset($v1);
