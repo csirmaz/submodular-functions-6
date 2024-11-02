@@ -24,7 +24,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
    usage: extract <iteration> <axno> <input> <output>
 */
 
-#define T_FACTOR	static int
+#define T_FACTOR    static int
 
 #if RANK==3
 #  include "ax3.c"
@@ -42,7 +42,7 @@ this program.  If not, see <https://www.gnu.org/licenses/>.
 #  error RANK should be defined to 3,4,5,6
 #endif
 
-#define	DIM	VARS
+#define    DIM    VARS
 
 #define stringify(x)    #x
 #define mkstringof(x)   stringify(x)
@@ -71,15 +71,15 @@ static void usage(void)
 }
 
 
-static int verbose;		/* verbose setting */
-static int checkrank;		/* 0: check; 1: no */
-static int noorbit;		/* 1 if no minimal version */
-static int iteration;		/* iteration we are in */
-static int axiomno[AXIOMS];	/* axioms handled so far */
-static int newax;		/* the new axiom to be added */
-static FILE *ifile;		/* input file */
-static FILE *ofile;		/* output file */
-static const char *skipfile;	/* the skipfile */
+static int verbose;          /* verbose setting */
+static int checkrank;        /* 0: check; 1: no */
+static int noorbit;          /* 1 if no minimal version */
+static int iteration;        /* iteration we are in */
+static int axiomno[AXIOMS];  /* axioms handled so far */
+static int newax;            /* the new axiom to be added */
+static FILE *ifile;          /* input file */
+static FILE *ofile;          /* output file */
+static const char *skipfile; /* the skipfile */
 
 
 static void handle_params(int argc, const char*argv[])
@@ -131,7 +131,7 @@ static void handle_params(int argc, const char*argv[])
 
 /* ==========================================================================*/
 
-#define EPS	5e-9
+#define EPS    5e-9
 
 static inline int is_zero(double x) {
      return (-EPS < (x) && (x) < EPS);
@@ -153,9 +153,9 @@ static int iinner(int axno,const int *ray)
 
 
 /* =================================================================== */
-static int posrays=0, negrays=0, zerorays=0;	// number of rays
-static int nextray[DIM];			// reading the  next ray
-static int newrays=0;				// rays in the output
+static int posrays=0, negrays=0, zerorays=0;    // number of rays
+static int nextray[DIM];             // reading the  next ray
+static int newrays=0;                // rays in the output
 
 
 /* read the input file first; compute the number of positive, negative rays
@@ -219,7 +219,7 @@ static void save_nextray(int ridx); // forward declaration
 #include "bitmap.h"
 static int *pos_store, *neg_store; // storing positive and negative rays
 
-#define STSIZE	(DIM+1)
+#define STSIZE    (DIM+1)
 
 static void second_input_scan(void)
 {
@@ -428,11 +428,11 @@ static void find_adjacent_rays(void)
 /* find the minimal permutation of nextray[] */
 
 
-static int minperm[DIM];	// the minimal permutation found so far 
-static int dual[DIM];		// the dual of intray[]
-static int nextperm[DIM];	// next permutation is generated here
+static int minperm[DIM];    // the minimal permutation found so far 
+static int dual[DIM];        // the dual of intray[]
+static int nextperm[DIM];    // next permutation is generated here
 
-static void fill_dual(void)	// fill dual[]
+static void fill_dual(void)    // fill dual[]
 {   
     for(int i = 0; i < DIM; i++) {
         dual[i] = 0;
@@ -480,8 +480,8 @@ static void check_minperm(void)
 
 /* ===================================================================== */
 // how many axioms are satisfied by minperm[]
-static int axn_given=0;			// weight of the ray
-static int handled_axioms[AXIOMS];	// axioms which are zero
+static int axn_given=0;            // weight of the ray
+static int handled_axioms[AXIOMS];    // axioms which are zero
 
 static int find_axrank(void)
 {  
@@ -551,7 +551,7 @@ static void save_nextray(int ridx)
 {
     if(find_axrank()) return; // not all axioms are >=0 
     if(ridx >= 0 && !are_adjacent_rays(ridx)) return; // not extremal
-    check_minperm();	// the result is in minperm[]
+    check_minperm();    // the result is in minperm[]
     // and print it
     newrays++;
     fprintf(ofile, "%d: %d", axn_given, minperm[0]);
