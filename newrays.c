@@ -35,7 +35,7 @@ o   DIM many coordinates of the next extremal ray
 
 */
 
-#define T_FACTOR	static int
+#define T_FACTOR    static int
 #if RANK==3
 #  include "ax3.c"
 #  include "sym3.c"
@@ -52,10 +52,11 @@ o   DIM many coordinates of the next extremal ray
 #  error RANK should be defined to 3,4,5,6
 #endif
 
-#define	DIM	VARS
+#define DIM    VARS
 
 #define stringify(x)    #x
 #define mkstringof(x)   stringify(x)
+
 
 /* =================================================================== */
 
@@ -63,7 +64,7 @@ o   DIM many coordinates of the next extremal ray
 #include <stdlib.h>
 #include <string.h>
 
-static void usage(void){
+static void usage(void) {
     printf(
 "usage: newr" mkstringof(RANK) " [--ray] <infile> <outfile> <baseray>\n"
 "extracting extremal rays from the list of neighbor subproblem for rank=" mkstringof(RANK) "\n"
@@ -74,100 +75,133 @@ static void usage(void){
     exit(1);
 }
 
-static int baseray[DIM];	/* the base ray from the argument */
-static int neigray[DIM];	/* the neightbor ray */
-static double newray[DIM];	/* new ray is computed here */
-static int intray[DIM];		/* the integer form of newray */
-static int noorbit;		/* 1 if no minimal version */
 
-static FILE *ifile;		/* input file */
-static FILE *ofile;		/* output file */
+static int baseray[DIM];   /* the base ray from the argument */
+static int neigray[DIM];   /* the neightbor ray */
+static double newray[DIM]; /* new ray is computed here */
+static int intray[DIM];    /* the integer form of newray */
+static int noorbit;        /* 1 if no minimal version */
 
-static int is_digit( char c){
-    return '0'<=c && c<='9';
+static FILE *ifile;        /* input file */
+static FILE *ofile;        /* output file */
+
+
+static int is_digit(char c) {
+    return '0' <= c && c <= '9';
 }
 
-static void handle_params(int argc, const char*argv[])
-{const char *w; int n;
-    noorbit=0;
-    if(argc>=2 && strcmp(argv[1],"--ray")==0){
-        argc--; argv++; noorbit=1;
+
+static void handle_params(int argc, const char *argv[]) {
+    const char *w; 
+    int n;
+    
+    noorbit = 0;
+    if(argc >= 2 && strcmp(argv[1], "--ray") == 0) {
+        argc--; 
+        argv++; 
+        noorbit = 1;
     }
-    if(argc!=4) usage();
-    w=argv[3]; /* base ray */
-    for(int i=0;i<DIM;i++){
-        if(*w==',') w++;
-        if(!is_digit(*w)){ printf("wrong character %c in base ray coord %d\n",*w||'?',i); exit(1); }
-        n=*w-'0'; w++;
-        while(is_digit(*w)){ 
-            n=10*n+(*w-'0'); w++;
-            if(n>10000){ printf("large coord %d at %d\n",n,i); exit(1);}
+    if(argc != 4) usage();
+    w = argv[3]; /* base ray */
+    for(int i = 0; i < DIM; i++) {
+        if(*w == ',') w++;
+        if(!is_digit(*w)) { printf("wrong character %c in base ray coord %d\n", *w || '?', i); exit(1); }
+        n = *w - '0'; 
+        w++;
+        while(is_digit(*w)) { 
+            n = 10 * n + (*w - '0'); 
+            w++;
+            if(n > 10000) { printf("large coord %d at %d\n", n, i); exit(1); }
         }
-        baseray[i]=n;
+        baseray[i] = n;
     }
-    if(*w){printf("Additional character %c at baseray\n",*w); exit(1); }
-    if(!argv[1] || ! *(argv[1]) || (ifile=fopen(argv[1],"r"))==NULL){
-       printf("Cannot open the input file\n"); exit(1);
+    if(*w) { printf("Additional character %c at baseray\n", *w); exit(1); }
+    if(!argv[1] || ! *(argv[1]) || (ifile = fopen(argv[1], "r")) == NULL) {
+        printf("Cannot open the input file\n"); exit(1);
     }
-    if(!argv[2] || ! *(argv[2]) || (ofile=fopen(argv[2],"a"))==NULL){
-       printf("Cannot append to the output file\n"); exit(1);
+    if(!argv[2] || ! *(argv[2]) || (ofile = fopen(argv[2], "a")) == NULL) {
+        printf("Cannot append to the output file\n"); exit(1);
     }
 }
+
 
 /* ==========================================================================*/
 
-static inline int is_zero(double x){
-     return (-1e-10<(x) && (x)<1e-10);
+static inline int is_zero(double x) {
+     return (-1e-10 < (x) && (x) < 1e-10);
 }
-static inline int not_zero(double x){
-    return ((x)<=-1e-10 || (x)>=1e-10);
+
+
+static inline int not_zero(double x) {
+    return ((x) <= -1e-10 || (x) >= 1e-10);
 }
-static int iinner(int axno,int *ray)
-{int v=0; int *ax=axioms[axno];
-    for(int i=0;i<DIM;i++) v+=ax[i]*ray[i];
+
+
+static int iinner(int axno, int *ray) {
+    int v = 0; 
+    int *ax = axioms[axno];
+    for(int i = 0; i < DIM; i++) v += ax[i] * ray[i];
     return v;
 }
 
+
 /* smallest multiple of v which is an integer */
-static int lcm(double v){
-    for(int dd=2;dd<200;dd++){
-        if(is_zero(v*dd-(int)(v*dd+1e-8))) return dd;
+static int lcm(double v) {
+    for(int dd = 2; dd < 200; dd++) {
+        if(is_zero(v * dd - (int)(v*dd + 1e-8))) return dd;
     }
-    printf("lcm: strange value to make an integer: %lg\n",v); exit(1);
+    printf("lcm: strange value to make an integer: %lg\n", v); 
+    exit(1);
     return 1;
 }
 
+
 /* gcd of two non-negative numbers, fast iterative Euclidean algorithm */
-static int gcd(int x,int y){
+static int gcd(int x, int y) {
 again:
-    if(x==1){ return 1;} if(x==0){ return y;}
-    y %= x; if(y==0){ return x;} if(y==1){ return 1;}
-    x %= y; goto again;
+    if(x == 1) { return 1; } 
+    if(x == 0) { return y; }
+    y %= x; 
+    if(y == 0) { return x; } 
+    if(y == 1) { return 1; }
+    x %= y; 
+    goto again;
 }
+
 
 /* make all coeffs of newray[] integer; store it in intray[].
    all coeffs in newray[] MUST be non-negative (not checked)
 */
-static void integrify(void)
-{int d,idx; double v; int iv;
-    for(int i=0;i<DIM;i++)intray[i]=0;
-    d=1;
-    for(int i=0;i<DIM;i++){
-       v=d*newray[i]; iv=(int)(v+1e-8);
-       intray[i]=iv;
-       if(not_zero(v-iv)){ d *= lcm(v-iv); }
+static void integrify(void) { 
+    int d, idx; 
+    double v; 
+    int iv;
+
+    for(int i = 0; i < DIM; i++) intray[i] = 0;
+    d = 1;
+    for(int i = 0; i < DIM; i++) {
+        v = d * newray[i]; 
+        iv = (int)(v + 1e-8);
+        intray[i] = iv;
+        if(not_zero(v - iv)) {  d *= lcm(v - iv); }
     }
-    if(d!=1){
-        for(int i=0;i<DIM;i++){
-            v=d*newray[i]; iv=(int)(v+1e-8);
-            intray[i]=iv;
-            if(not_zero(v-iv)){ printf("integrify problem v=%f,iv=%d\n",v,iv); exit(1); }
+    if(d != 1) {
+        for(int i = 0; i < DIM; i++) {
+            v = d * newray[i]; 
+            iv = (int)(v + 1e-8);
+            intray[i] = iv;
+            if(not_zero(v - iv)) { printf("integrify problem v=%f,iv=%d\n", v, iv); exit(1); }
         }
     }
-    d=gcd(intray[0],intray[1]); idx=2;
-    while(d!=1 && idx<DIM){ d=gcd(intray[idx],d); idx++; }
-    if(d>1){ for(int i=0;i<DIM;i++)intray[i] /= d; }
+    d = gcd(intray[0], intray[1]); 
+    idx = 2;
+    while(d != 1 && idx < DIM) { 
+        d = gcd(intray[idx], d); 
+        idx++; 
+    }
+    if(d > 1) { for(int i = 0; i < DIM; i++) intray[i] /= d; }
 }
+
 
 /* from baseray[] and neigray[] determine the double newray[]
    when found, call interify() to store the new ray in intray[]
@@ -175,141 +209,167 @@ static void integrify(void)
 
 static int baseinner[AXIOMS]; /* baseinner[axn]=iiner(axn,baseray) */
 
-static void find_neighbor(void)
-{int midx,iv1,iv2; double mv,v;
- static int baseinnerfilled=0; /* make sure it is filled only once */
-    if(!baseinnerfilled){ baseinnerfilled=1;
-       for(int axn=0;axn<AXIOMS;axn++) baseinner[axn]=iinner(axn,baseray);
+static void find_neighbor(void) {
+    int midx, iv1, iv2; 
+    double mv, v;
+    static int baseinnerfilled = 0; /* make sure it is filled only once */
+    
+    if(!baseinnerfilled) { 
+        baseinnerfilled = 1;
+        for(int axn = 0; axn < AXIOMS; axn++) baseinner[axn] = iinner(axn, baseray);
     }
-    midx=-1;mv=0;
-    for(int axn=0;axn<AXIOMS;axn++){
-        iv1=baseinner[axn]; iv2=iinner(axn,neigray);
-        if(iv1==0){ 
-           if(iv2<0){printf("Impossible, neigray negative\n"); exit(1); }
+    midx = -1;
+    mv = 0;
+    for(int axn = 0; axn < AXIOMS; axn++) {
+        iv1 = baseinner[axn]; 
+        iv2 = iinner(axn, neigray);
+        if(iv1 == 0) { 
+            if(iv2 < 0) { printf("Impossible, neigray negative\n"); exit(1); }
         } else {
-           v=((double)iv2)/((double)iv1);
-           if(midx<0 || mv>v){midx=axn; mv=v; }
+            v = ((double)iv2) / ((double)iv1);
+            if(midx < 0 || mv > v) { midx = axn; mv = v; }
         }
     }
-    if(midx<0){printf("Impossible: cannot make neigray to inner\n"); exit(1); }
-    for(int i=0;i<DIM;i++){
-        newray[i]=((double)(neigray[i]))-mv*((double)(baseray[i]));
+    if(midx < 0) { printf("Impossible: cannot make neigray to inner\n"); exit(1); }
+    for(int i = 0; i < DIM; i++) {
+        newray[i] = ((double)(neigray[i])) - mv * ((double)(baseray[i]));
     }
     integrify(); /* now convert newray[] => intray[] */
 }
+
 
 /* ====================================================================== */
 
 /* find the minimal permutation of intray[] */
 
-static int minperm[DIM];	// the minimal permutation found so far 
-static int dual[DIM];		// the dual of intray[]
-static int nextperm[DIM];	// next permutation is generated here
+static int minperm[DIM];     // the minimal permutation found so far 
+static int dual[DIM];        // the dual of intray[]
+static int nextperm[DIM];    // next permutation is generated here
 
-static void fill_dual(void){	// fill dual[]
-    for(int i=0;i<DIM;i++){
-        dual[i]=0;
-        for(int j=0;j<DIM;j++){ dual[i]+=intray[j]*dualmatrix[i][j]; }
+static void fill_dual(void) { // fill dual[]
+    for(int i = 0; i < DIM; i++) {
+        dual[i] = 0;
+        for(int j = 0; j < DIM; j++) { dual[i] += intray[j] * dualmatrix[i][j]; }
     }
 }
 
-static int cmp_as_string(int a1,int b1)
-{   if(a1==b1) return 0; if(a1<b1) return +1; return -1; }
+
+static int cmp_as_string(int a1, int b1) {
+    if(a1 == b1) return 0; 
+    if(a1 < b1) return +1; 
+    return -1; 
+}
+
 
 /* if nextperm[] is lexicographycally smaller than mimperm, replace */
-static void lexminperm(void)
-{int smaller=0;
-    for(int i=0;smaller==0 && i<DIM;i++){
-        smaller=cmp_as_string(nextperm[i],minperm[i]);
+static void lexminperm(void) {
+    int smaller = 0;
+    
+    for(int i = 0; smaller == 0 && i < DIM; i++) {
+        smaller = cmp_as_string(nextperm[i], minperm[i]);
     }
-    if(smaller>0){
-       for(int i=0;i<DIM;i++)minperm[i]=nextperm[i];
+    if(smaller > 0) {
+       for(int i = 0; i < DIM; i++) minperm[i] = nextperm[i];
     }
 }
 
-static void find_minperm(void){
+
+static void find_minperm(void) {
     // fill the minimal value
-    for(int i=0;i<DIM;i++){minperm[i]=intray[i]; }
+    for(int i = 0; i < DIM; i++) { minperm[i] = intray[i]; }
     if(noorbit) return;
     fill_dual(); // and compute the dual
-    for(int pm=0;pm<VPERMNO;pm++){
-       for(int i=0;i<DIM;i++)nextperm[i]=intray[VPERMS[pm][i]];
-       lexminperm();
-       for(int i=0;i<DIM;i++)nextperm[i]=dual[VPERMS[pm][i]];
-       lexminperm();
+    for(int pm = 0; pm < VPERMNO; pm++) {
+        for(int i = 0; i < DIM; i++) nextperm[i] = intray[VPERMS[pm][i]];
+        lexminperm();
+        for(int i = 0; i < DIM; i++) nextperm[i] = dual[VPERMS[pm][i]];
+        lexminperm();
     }
 }
 
+
 // how many axioms are satisfied by minperm[]
-static int find_axrank(void)
-{int total=0;
-   for(int axn=0;axn<AXIOMS;axn++){
-      if(iinner(axn,minperm)==0) total++;
-   }
-   return total;
+static int find_axrank(void) {
+    int total = 0;
+    
+    for(int axn = 0; axn < AXIOMS; axn++) {
+        if(iinner(axn, minperm) == 0) total++;
+    }
+    return total;
 }
 
-static void print_minperm(void){
-    fprintf(ofile,"%d: %d",find_axrank(),minperm[0]);
-    for(int i=1;i<DIM;i++) fprintf(ofile,",%d",minperm[i]);
-    fprintf(ofile,"\n");
+
+static void print_minperm(void) {
+    fprintf(ofile, "%d: %d", find_axrank(), minperm[0]);
+    for(int i = 1; i < DIM; i++) fprintf(ofile, ",%d", minperm[i]);
+    fprintf(ofile, "\n");
 }
+
 
 /* =============================================================================== */
 /* axioms handled; on these the base ray vanished */
 static int handled_axioms[AXIOMS];
 
-static void skip_input_header(void)
-{int n,w;
-    for(int i=0;i<AXIOMS;i++) {handled_axioms[i]=-1; }
-    n=w=0; if(fscanf(ifile,"%d",&w)!=1 || w!=1 || 
-            fscanf(ifile,"%d%d",&w,&n)!=2 || n<DIM-1 || n>=AXIOMS){
-         printf("error in ray file header\n"); exit(1);
+static void skip_input_header(void) {
+    int n, w;
+    
+    for(int i = 0; i < AXIOMS; i++) { handled_axioms[i] = -1; }
+    n = w = 0; 
+    if(fscanf(ifile, "%d", &w) != 1 || w!=1 || 
+        fscanf(ifile, "%d%d", &w, &n) != 2 || n < DIM-1 || n >= AXIOMS
+    ) {
+        printf("error in ray file header\n"); 
+        exit(1);
     }
-    for(;n>0;n--){
-       if(fscanf(ifile,"%d",&w)!=1 || w<0 || w>=AXIOMS || handled_axioms[w]>0){
-         printf("error in ray file header list\n"); exit(1);
-       }
-       handled_axioms[w]=1;
+    
+    for(; n > 0; n--) {
+        if(fscanf(ifile, "%d", &w) != 1 || w < 0 || w >= AXIOMS || handled_axioms[w] > 0) {
+            printf("error in ray file header list\n"); exit(1);
+        }
+        handled_axioms[w] = 1;
     }
-    for(int i=0;i<AXIOMS;i++){
-        if(handled_axioms[i]>0){
-           if(iinner(i,baseray)!=0){printf("ray file header: axiom %d should be zero\n",i); exit(1); }
-        } else if(iinner(i,baseray)==0){ 
-           printf("ray file header: axiom %d should NOT be zero\n",i); exit(1);}
+    
+    for(int i = 0; i < AXIOMS; i++) {
+        if(handled_axioms[i] > 0) {
+            if(iinner(i, baseray) != 0) { printf("ray file header: axiom %d should be zero\n", i); exit(1); }
+        } else if(iinner(i, baseray) == 0) { 
+            printf("ray file header: axiom %d should NOT be zero\n", i); exit(1); }
     }
 }
 
-static int read_next_ray(void)
-{int ret;
-    ret=fscanf(ifile,"%d",&(neigray[0]));
-    if(ret<0) return 0; // no more ray
-    if(ret!=1){ printf("Error reading next ray\n"); exit(1);}
-    for(int i=1;i<DIM;i++)
-      if(fscanf(ifile,"%d",&(neigray[i]))!=1){
-          printf("Error reading coordinate %d of next ray\n",i); exit(1);
-      }
+
+static int read_next_ray(void) {
+    int ret;
+    
+    ret = fscanf(ifile, "%d", &(neigray[0]));
+    if(ret < 0) return 0; // no more ray
+    if(ret != 1) { printf("Error reading next ray\n"); exit(1); }
+    for(int i = 1; i < DIM; i++)
+        if(fscanf(ifile, "%d", &(neigray[i])) != 1) {
+            printf("Error reading coordinate %d of next ray\n", i); exit(1);
+        }
     return 1;
 }
 
+
 /* ===================================================================== */
 
-int main(int argc,const char*argv[])
-{int total=0;
-    handle_params(argc,argv);
+int main(int argc, const char *argv[]) {
+    int total = 0;
+    
+    handle_params(argc, argv);
     skip_input_header();
-    while(read_next_ray()){ // next neigray has been read
-        find_neighbor();    // generate next ray to intray[]
-        find_minperm();     // minimal symmetric version; can be the same as before
+    while(read_next_ray()) { // next neigray has been read
+        find_neighbor();     // generate next ray to intray[]
+        find_minperm();      // minimal symmetric version; can be the same as before
         print_minperm();
         total++;
     }
-    fclose(ifile);fclose(ofile);
-    printf("*** %d rays appended to file %s\n",total,argv[2]);
+    fclose(ifile);
+    fclose(ofile);
+    printf("*** %d rays appended to file %s\n", total, argv[2]);
     return 0;
 }
 
 
 /* EOF */
-
-
