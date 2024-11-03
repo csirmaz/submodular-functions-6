@@ -7,6 +7,8 @@ supplementary material for the paper:
 E. P. Csirmaz and L. Csirmaz:
 Attempting the impossible: enumerating extremal submodular functions for n=6.
 
+The preprint is available on arXiv at https://arxiv.org/abs/2410.15502 .
+
 ## Build
 
 To build the necessary binaries, ensure `gcc` is installed, and run `build.sh`.
