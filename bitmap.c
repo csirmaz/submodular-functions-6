@@ -51,9 +51,9 @@ corresponding bit from C(w).
 */
 
 #include "bitmap.h"
-#include <stdint.h>	/* types uint32_t, uint64_t */
-#include <stdlib.h>	/* malloc, free */
-#include <strings.h>	/* bzero */
+#include <stdint.h>    /* types uint32_t, uint64_t */
+#include <stdlib.h>    /* malloc, free */
+#include <strings.h>   /* bzero */
 
 /* bitmaps are unsigned words of 32 or 64 bits; have type BITMAP_t
 *   declare a bitmap array containing "total" many bits:
@@ -64,21 +64,21 @@ corresponding bit from C(w).
 
 #ifdef DEBUG
 #  include <stdio.h>
-#  define ASSERT(expr)   ((void)((expr)||(assert_fails(#expr,__LINE__),1)))
-  static void assert_fails(const char* text,int line){
-    printf("Line %d: assert \"%s\" failed\n",line,text);
+#  define ASSERT(expr)  ((void)((expr)||(assert_fails(#expr,__LINE__),1)))
+  static void assert_fails(const char* text, int line) {
+    printf("Line %d: assert \"%s\" failed\n", line, text);
   }
 #else
-#  define ASSERT(expr)	/* empty */
+#  define ASSERT(expr)    /* empty */
 #endif
 
 /* decide the bitmap size. We check here UINT64_MAX to be defined; 
    it can be changed to anything else */
 
-#ifdef UINT64_MAX		/* using 64 bit bitmaps */
+#ifdef UINT64_MAX        /* using 64 bit bitmaps */
   #define BITMAP_64
   typedef uint64_t BITMAP_t;
-  #define packsizelog	3	/* sizeof(BITMAP_t) == 1<< packsizelof */
+  #define packsizelog   3    /* sizeof(BITMAP_t) == 1 << packsizelof */
 #else
   #warning Using 32 bit bitmaps
   #define BITMAP_32
@@ -86,12 +86,12 @@ corresponding bit from C(w).
   #define packsizelog   2
 #endif
 
-#define packsize	(1<<packsizelog)	/* 4 or 8 bytes */
-#define packshift	(packsizelog+3)		/* in bits, 5 or 6 */
-#define bitsperword	(1<<packshift)		/* 32 or 64 */
-#define packmask	((1<<packshift)-1)	/* 31 or 63 */
-#define BITMAP1		((BITMAP_t)1u)
-#define BITMAP0		((BITMAP_t)0u)
+#define packsize    (1<<packsizelog)    /* 4 or 8 bytes */
+#define packshift   (packsizelog+3)     /* in bits, 5 or 6 */
+#define bitsperword (1<<packshift)      /* 32 or 64 */
+#define packmask    ((1<<packshift)-1)  /* 31 or 63 */
+#define BITMAP1     ((BITMAP_t)1u)
+#define BITMAP0     ((BITMAP_t)0u)
 
 /* Basic macros handling a bitmap array with more than 32 (or 64)
 *  bitcount:
@@ -109,29 +109,29 @@ corresponding bit from C(w).
 /* bool extract bit(BITMAP-t bm[], int cnt)
    void clear_bit  (BITMAP_t bm[], int cnt)
    void set_bit    (BITMAP_t bm[], int cnt) */
-#define extract_bit(bm,cnt)	\
+#define extract_bit(bm, cnt)  \
     (((bm)[(cnt)>>packshift]>>((cnt)&packmask))&1)
 
-#define clear_bit(bm,cnt)	\
+#define clear_bit(bm, cnt)    \
     (bm)[(cnt)>>packshift] &= ~(BITMAP1<<((cnt)&packmask))
 
-#define set_bit(bm,cnt)		\
+#define set_bit(bm, cnt)      \
     (bm)[(cnt)>>packshift] |= (BITMAP1<<((cnt)&packmask))
 
 /* int bmarray_size(int cnt)
 *   number of BITMAP_t words to contain cnt bits
 */
-#define bmarray_size(cnt)	\
+#define bmarray_size(cnt)     \
     (((cnt)+packmask)>>packshift)
 
 /* int get bitcount(BITMAP_t v)
 *     count the number of bits in a BITMAP word
 */
-#if __x86_64__ || __amd64__	/* assembler code on these architectures */
+#if __x86_64__ || __amd64__    /* assembler code on these architectures */
 
 #warning Using x86 assembler code
-static inline int get_bitcount(BITMAP_t v)
-{register BITMAP_t res;
+static inline int get_bitcount(BITMAP_t v) {
+    register BITMAP_t res;
     asm ("popcnt %[w], %[t]"
          :[t] "=rm" (res)
          :[w] "rm"  (v));
@@ -139,28 +139,28 @@ static inline int get_bitcount(BITMAP_t v)
 }
 
 #else /* not x86 architecture */
-static int get_bitcount(BITMAP_t v)
-{
+static int get_bitcount(BITMAP_t v) {
 //    these exceptional cases do not seem to help
 //    if(v==BITMAP0){ return 0; }
 //    if(v==~BITMAP0){ return 1<<packshift; }
 #   ifdef BITMAP_32     /* 32 bit bitmap */
-    v=(v&0x55555555u)+((v>>1)&0x55555555u);
-    v=(v&0x33333333u)+((v>>2)&0x33333333u);
-    v=(v&0x0F0F0F0Fu)+((v>>4)&0x0F0F0F0Fu);
-    v=(v&0x00FF00FFu)+((v>>8)&0x00FF00FFu);
-    return (int)((v&0x0000FFFF)+(v>>16));
+    v = (v & 0x55555555u) + ((v >> 1) & 0x55555555u);
+    v = (v & 0x33333333u) + ((v >> 2) & 0x33333333u);
+    v = (v & 0x0F0F0F0Fu) + ((v >> 4) & 0x0F0F0F0Fu);
+    v = (v & 0x00FF00FFu) + ((v >> 8) & 0x00FF00FFu);
+    return (int)((v & 0x0000FFFF) + (v >> 16));
 #   else                /* 64 bit bitmap */
-    v=(v&0x5555555555555555ul)+((v>>1)&0x5555555555555555ul);
-    v=(v&0x3333333333333333ul)+((v>>2)&0x3333333333333333ul);
-    v=(v&0x0F0F0F0F0F0F0F0Ful)+((v>>4)&0x0F0F0F0F0F0F0F0Ful);
-    v=(v&0x00FF00FF00FF00FFul)+((v>>8)&0x00FF00FF00FF00FFul);
-    v=(v&0x0000FFFF0000FFFFul)+((v>>16)&0x0000FFFF0000FFFFul);
-    return (int)((v&0xFFFF)+(v>>32));
-#   endif		/* 64 bit bitmap */
+    v = (v & 0x5555555555555555ul) + ((v >> 1) & 0x5555555555555555ul);
+    v = (v & 0x3333333333333333ul) + ((v >> 2) & 0x3333333333333333ul);
+    v = (v & 0x0F0F0F0F0F0F0F0Ful) + ((v >> 4) & 0x0F0F0F0F0F0F0F0Ful);
+    v = (v & 0x00FF00FF00FF00FFul) + ((v >> 8) & 0x00FF00FF00FF00FFul);
+    v = (v & 0x0000FFFF0000FFFFul) + ((v >> 16) & 0x0000FFFF0000FFFFul);
+    return (int)((v & 0xFFFF) + (v >> 32));
+#   endif        /* 64 bit bitmap */
 }
 
 #endif /* x86 assembler code */
+
 
 /* ======================================================================= */
 /* Adjacency bitmaps of axioms are in
@@ -172,63 +172,76 @@ static int get_bitcount(BITMAP_t v)
 */
 
 static int AXIOMS,RAYS;
-static int AxAdjSize;		// bmarray_size(AXIOMS)
-static int RayAdjSize;		// bmarray_size(RAYS)
-static BITMAP_t *AxAdjStore;	// AXIOMS bitmap arrays, each for RAYS bits
-static BITMAP_t *RayAdjStore;	// RAYS bitmap arrays, each for AXIOMS bits
-static BITMAP_t *BigRays;	// bitmap storing rays with large intersection
-static BITMAP_t **joint;	// AXIOM bitmaps for intersection
+static int AxAdjSize;          // bmarray_size(AXIOMS)
+static int RayAdjSize;         // bmarray_size(RAYS)
+static BITMAP_t *AxAdjStore;   // AXIOMS bitmap arrays, each for RAYS bits
+static BITMAP_t *RayAdjStore;  // RAYS bitmap arrays, each for AXIOMS bits
+static BITMAP_t *BigRays;      // bitmap storing rays with large intersection
+static BITMAP_t **joint;       // AXIOM bitmaps for intersection
 
-#define AxAdj(ax)	\
-    (AxAdjStore+(ax*RayAdjSize))
-#define RayAdj(ray)	\
-    (RayAdjStore+(ray*AxAdjSize))
+#define AxAdj(ax)    \
+    (AxAdjStore + (ax * RayAdjSize))
+#define RayAdj(ray)  \
+    (RayAdjStore + (ray * AxAdjSize))
 
 /* allocate memory for the bitmaps
 *    return 0 on memory error, otherwise the allocated memory size
 */
 
-size_t init_bitmaps(int axiomno, int rayno){
-    AXIOMS = axiomno; RAYS=rayno;
-    AxAdjSize=bmarray_size(AXIOMS);
-    RayAdjSize=bmarray_size(RAYS);
-    if(!(AxAdjStore=(BITMAP_t*)malloc(sizeof(BITMAP_t)*AXIOMS*RayAdjSize)))
-         return 0;
-    if(!(RayAdjStore=(BITMAP_t*)malloc(sizeof(BITMAP_t)*RAYS*AxAdjSize)))
-         return 0;
-    if(!(BigRays=(BITMAP_t*)malloc(sizeof(BITMAP_t)*RayAdjSize)))
-         return 0;
-    if(!(joint=(BITMAP_t**)malloc(sizeof(BITMAP_t*)*AXIOMS)))
-         return 0;
-    bzero(AxAdjStore,sizeof(BITMAP_t)*AXIOMS*RayAdjSize);
-    bzero(RayAdjStore,sizeof(BITMAP_t)*RAYS*AxAdjSize);
-    return sizeof(BITMAP_t)*(AXIOMS+1)*RayAdjSize+sizeof(BITMAP_t)*RAYS*AxAdjSize
-           + sizeof(BITMAP_t*)*AXIOMS;
+size_t init_bitmaps(int axiomno, int rayno) {
+    AXIOMS = axiomno; 
+    RAYS=rayno;
+    AxAdjSize = bmarray_size(AXIOMS);
+    RayAdjSize = bmarray_size(RAYS);
+    if(!(AxAdjStore = (BITMAP_t*)malloc(sizeof(BITMAP_t) * AXIOMS * RayAdjSize)))
+        return 0;
+    if(!(RayAdjStore = (BITMAP_t*)malloc(sizeof(BITMAP_t) * RAYS * AxAdjSize)))
+        return 0;
+    if(!(BigRays = (BITMAP_t*)malloc(sizeof(BITMAP_t) * RayAdjSize)))
+        return 0;
+    if(!(joint = (BITMAP_t**)malloc(sizeof(BITMAP_t*) * AXIOMS)))
+        return 0;
+    bzero(AxAdjStore, sizeof(BITMAP_t) * AXIOMS * RayAdjSize);
+    bzero(RayAdjStore, sizeof(BITMAP_t) * RAYS * AxAdjSize);
+    return sizeof(BITMAP_t) * (AXIOMS + 1) * RayAdjSize + sizeof(BITMAP_t) * RAYS * AxAdjSize
+        + sizeof(BITMAP_t*) * AXIOMS;
 }
 
-void close_bitmaps(void){
-    free(AxAdjStore); free(RayAdjStore); free(joint);
+
+void close_bitmaps(void) {
+    free(AxAdjStore); 
+    free(RayAdjStore); 
+    free(joint);
 }
 
-void add_bitmap(int axiom,int ray){
-    ASSERT(0<=axiom && axiom<AXIOMS);
-    ASSERT(0<=ray && ray<RAYS);
-    set_bit(AxAdj(axiom),ray);
-    set_bit(RayAdj(ray),axiom);
+
+void add_bitmap(int axiom, int ray) {
+    ASSERT(0 <= axiom && axiom < AXIOMS);
+    ASSERT(0 <= ray && ray < RAYS);
+    set_bit(AxAdj(axiom), ray);
+    set_bit(RayAdj(ray), axiom);
 }
+
 
 /* Given ray r1, create the ray bitmap BigRays as
 *     B(r2)=1 if r1!=r2 and intersect_size(r1,r2)>=dim-2
 */
 static BITMAP_t *RayAdjR1;
 
-void prepare_adjacency(int r1,int DIMminus2)
-{register BITMAP_t *L2; BITMAP_t *g; BITMAP_t onebit;
-    bzero(BigRays,sizeof(BITMAP_t)*RayAdjSize);
-    g=BigRays; L2=RayAdj(0); RayAdjR1=RayAdj(r1); onebit=BITMAP1;
-    for(int r2=0;r2<RAYS;r2++){
-        if(__builtin_expect(r2!=r1,1)){
-           int total=0; register BITMAP_t *L1=RayAdjR1;
+void prepare_adjacency(int r1, int DIMminus2) {
+    register BITMAP_t *L2; 
+    BITMAP_t *g; 
+    BITMAP_t onebit;
+    
+    bzero(BigRays, sizeof(BITMAP_t) * RayAdjSize);
+    g = BigRays; 
+    L2 = RayAdj(0); 
+    RayAdjR1 = RayAdj(r1); 
+    onebit = BITMAP1;
+    for(int r2 = 0; r2 < RAYS; r2++) {
+        if(__builtin_expect(r2 != r1, 1)) {
+            int total=0; 
+            register BITMAP_t *L1 = RayAdjR1;
            for(int i=0;i<AxAdjSize;i++,L1++,L2++)
                 total += get_bitcount((*L1)&(*L2));
            if(total>=DIMminus2) *g |= onebit;
@@ -250,8 +263,8 @@ int fast_raycheck(int r2)
 */
 
 int are_adjacent_rays(int r2)
-{int nax=0;				// number of axioms
- int idx2;				// bitmap word counter
+{int nax=0;                // number of axioms
+ int idx2;                // bitmap word counter
  register BITMAP_t *L1,*L2;
     L1=RayAdjR1; L2=RayAdj(r2);
     for(int i=0;i<AXIOMS;i+=bitsperword,L1++,L2++){
