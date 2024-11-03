@@ -240,20 +240,23 @@ void prepare_adjacency(int r1, int DIMminus2) {
     onebit = BITMAP1;
     for(int r2 = 0; r2 < RAYS; r2++) {
         if(__builtin_expect(r2 != r1, 1)) {
-            int total=0; 
+            int total = 0; 
             register BITMAP_t *L1 = RayAdjR1;
-           for(int i=0;i<AxAdjSize;i++,L1++,L2++)
-                total += get_bitcount((*L1)&(*L2));
-           if(total>=DIMminus2) *g |= onebit;
+            for(int i = 0; i < AxAdjSize; i++, L1++, L2++)
+                total += get_bitcount((*L1) & (*L2));
+            if(total >= DIMminus2) *g |= onebit;
         } else {
            L2 += AxAdjSize;
         }
-        if((onebit<<=1)==0){ onebit=BITMAP1; g++;}
+        if((onebit <<= 1) == 0) { onebit = BITMAP1; g++; }
     }
 }
 
-int fast_raycheck(int r2)
-{ return extract_bit(BigRays,r2)==0; }
+
+int fast_raycheck(int r2) { 
+    return extract_bit(BigRays, r2) == 0;
+}
+
 
 /* Rays r1 and r2 are adjacent, it there are at least dim-2 
 *  axioms containing both of them, moreover intersection the
@@ -262,29 +265,33 @@ int fast_raycheck(int r2)
 *  array joint[].
 */
 
-int are_adjacent_rays(int r2)
-{int nax=0;                // number of axioms
- int idx2;                // bitmap word counter
- register BITMAP_t *L1,*L2;
-    L1=RayAdjR1; L2=RayAdj(r2);
-    for(int i=0;i<AXIOMS;i+=bitsperword,L1++,L2++){
-        int idx=i;
-        BITMAP_t w=(*L1)&(*L2);
-        while(w){
-            while((w&0xF)==0){ idx+=4; w>>=4; }
-            if(w&1){ joint[nax]=AxAdj(idx); nax++; }
-            idx++; w>>=1;
+int are_adjacent_rays(int r2) {
+    int nax = 0;             // number of axioms
+    int idx2;                // bitmap word counter
+    register BITMAP_t *L1, *L2;
+    
+    L1 = RayAdjR1; 
+    L2 = RayAdj(r2);
+    for(int i = 0; i < AXIOMS; i += bitsperword, L1++, L2++) {
+        int idx = i;
+        BITMAP_t w = (*L1) & (*L2);
+        while(w) {
+            while((w & 0xF) == 0) { idx += 4; w >>= 4; }
+            if(w & 1) { joint[nax] = AxAdj(idx); nax++; }
+            idx++; 
+            w >>= 1;
         }
     }
     // prepare the intersection of BigRays and the first axiom
-    idx2=r2>>packshift;
+    idx2 = r2 >> packshift;
     // go over all bitmap words, abort as soon as it is empty
-    L1=BigRays; L2=joint[0];
-    for(int i=0;i<RayAdjSize;i++,L1++,L2++){
-        register BITMAP_t w=(*L1)&(*L2);
-        if(__builtin_expect(i==idx2,0)) w &= ~(BITMAP1<<(r2&packmask));
-        for(int j=1;w!=0  && j<nax;j++){ w &= (joint[j])[i]; }
-        if(w!=0) return 0;
+    L1 = BigRays; 
+    L2 = joint[0];
+    for(int i = 0; i < RayAdjSize; i++, L1++, L2++) {
+        register BITMAP_t w = (*L1) & (*L2);
+        if(__builtin_expect(i == idx2, 0)) w &= ~(BITMAP1 << (r2 & packmask));
+        for(int j = 1; w != 0 && j < nax; j++) { w &= (joint[j])[i]; }
+        if(w != 0) return 0;
     }
     // the intersection is empty; they are adjacent
     return 1;
