@@ -81,3 +81,8 @@ and calls `bin/neig<N>` until the DD method completes. Finally calls
 cone.
 
 `build.sh` - Script to call `gcc` to build all binaries.
+
+### Raw data
+
+`figures-data` - Raw data for the figures and charts in the paper can be found
+in the folder https://github.com/csirmaz/submodular-functions-6/tree/main/figures-data .
