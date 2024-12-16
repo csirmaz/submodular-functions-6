@@ -29,6 +29,18 @@ file `/tmp/v-all.txt`, use
 A partial list of 360 billion extremal submodular functions for N=6 is available at
 https://zenodo.org/records/13954788 .
 
+## Quickstart
+
+```bash
+# Clone the repository
+$ git clone https://github.com/csirmaz/submodular-functions-6.git
+$ cd submodular-functions-6
+# Compile the binaries
+$ sudo apt-get install gcc
+$ ./build.sh
+```
+
+
 ## Files
 
 `ax<N>.c` -  p-standardized submodular inequalities in C structure for base set
@@ -43,26 +55,26 @@ the DD method. It uses assembler instructions to count the bits in a 64-bit word
 `iterate.c` - Implementation of a single iteration of the DD method as a pipe.
 It reads the description of the problem, the next inequality, and then
 produces the result of the iteration. Should be compiled for each
-base size separately. Used by the controller program `base.pl`.
-To compile, use
+base size N separately. Used by the controller program `base.pl`.
+To compile for a given N, use
 `gcc -O3 -o bin/iter<N> -D RANK=<N> iterate.c bitmap.c`
 
 `neig.c` - A version of `iterate.c` for computing the neighbors of a ray. Used by
 the controller program `runjob.pl`. Should be compiled for each base
-size separately. To compile, use
+size N separately. To compile for a given N, use
 `gcc -O3 -o bin/neig<N> -D RANK=<N> neig.c bitmap.c`
 
 `newrays.c` - Generates the extremal rays from the neighbor enumeration. It can
 produce a canonical representative from the corresponding orbit
 rather than the ray itself. Used by the controller program `runjob.pl`.
-Sould be compiled for each base size separately. To compile, use
+Sould be compiled for each base size N separately. To compile for a given N, use
 `gcc -O3 -o bin/newr<N> -D RANK=<N> newrays.c`
 
 `extract.c` - Generate extremal rays from an intermediate cone of the DD method
 as produced by the controller program `base.pl`. It can produce a
 canonical representative from the corresponding orbit rather than
-the ray itself. Should be compiled for each base size separately.
-To compile, use
+the ray itself. Should be compiled for each base size N separately.
+To compile for a given N, use
 `gcc -O3 -o bin/extr<N> -D RANK=<N> extract.c bitmap.c`
 
 `base.pl` - Controller program to execute all iterations of the DD method for
