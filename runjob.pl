@@ -36,7 +36,7 @@ sub usage {
     print "  --topt    use the tail-optimal axiom order (default)\n";
     print "  --rec     recursive order of axioms\n";
     print "  --dry     print list of axioms, but do not process\n";
-    print "  --ray     generate neighborimg rays, not orbits\n";
+    print "  --ray     generate neighboring rays, not orbits\n";
     print "  rayfile   rays to be probed\n";
     print "  filestub  result is appended to filesub-all.txt; processed rays to\n";
     print "            filestub-probed.txt, and the log to filestub-log.txt\n"; 
@@ -986,9 +986,10 @@ sub process_rayfile {
     while (<RAYFILE>) {
         my ($label, $ray);
         if (/^\#?(\w+)\s+\d+:\s+([\d,]+)$/) {
-            $label = $1, $ray = $2;
+            $label = $1;
+            $ray = $2;
         }
-        elsif (/^\#?(\w+)\s+([\d,]+)$/) {
+        elsif (/^\#?(\w+):?\s+([\d,]+)$/) {
             $label = $1;
             $ray   = $2;
         }
