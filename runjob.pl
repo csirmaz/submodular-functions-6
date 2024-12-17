@@ -31,7 +31,20 @@ sub usage {
     my ($msg) = @_;
 
     if ($msg) { print "$msg\n"; }
-    print "usage: runjob.pl <N> [options] <rayfile> <filestub>\n", "  N         size of base set: 3,4,5,6\n", "  --topt    use the tail-optimal axiom order (default)\n", "  --rec     recursive order of axioms\n", "  --dry     print axiom list, but do not process\n", "  --ray     gnerate neightbor rays, not orbits\n", "  rayfile   rays to be probed\n", "  filestub  result is appended to filesub-all.txt; processed rays to\n", "            filestub-probed.txt, and the log to filestub-log.txt\n", "Lines in rayfile are |<label> <ray>| where label is alphanumeric, and\n", "ray is a comma-separated list of integers (no space).\n", "If file \"<filestub>-skip\" exists, the ray currently processed is skipped;\n", "if \"<filestub>-stop\" exists, processing is stopped after finishing\n", "the current ray.\n";
+    print "Usage: runjob.pl <N> [options] <rayfile> <filestub>\n";
+    print "  N         size of base set: 3,4,5,6\n";
+    print "  --topt    use the tail-optimal axiom order (default)\n";
+    print "  --rec     recursive order of axioms\n";
+    print "  --dry     print list of axioms, but do not process\n";
+    print "  --ray     generate neighborimg rays, not orbits\n";
+    print "  rayfile   rays to be probed\n";
+    print "  filestub  result is appended to filesub-all.txt; processed rays to\n";
+    print "            filestub-probed.txt, and the log to filestub-log.txt\n"; 
+    print "Lines in the rayfile are |<label> <ray>| where label is alphanumeric, and\n";
+    print "ray is a comma-separated list of integers (without space).\n";
+    print "If the file \"<filestub>-skip\" exists, the ray currently processed is skipped;\n";
+    print "if \"<filestub>-stop\" exists, processing is stopped after finishing\n";
+    print "the current ray.\n";
     exit(0);
 }
 

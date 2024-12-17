@@ -36,14 +36,14 @@ sub usage {
     if ($msg) { print "$msg\n"; }
     print <<USAGE;
 usage: base.pl <N> [options] <filestub>
-   N         size of base set: 3,4,5,6
-   --topt    tail-optimal inequality order (default)
-   --rec     recursive inequality order
-   --lexmin  lexmin inequality order with random shuffling of variables
-   --dry     print axiom list but do not process
+   N         size of the base set: 3,4,5,6
+   --topt    use tail-optimal inequality order (default)
+   --rec     use recursive inequality order
+   --lexmin  use lexmin inequality order with random shuffling of variables
+   --dry     print list of axioms but do not process
    --purge   delete intermediate results
    filestub  used for final and temporary files
-If <filestub>-stop exists, stop processing
+If the file <filestub>-stop exists, stop processing
 USAGE
     exit(0);
 }

@@ -9,21 +9,6 @@ Attempting the impossible: enumerating extremal submodular functions for n=6.
 
 The preprint is available on arXiv at https://arxiv.org/abs/2410.15502 .
 
-## Build
-
-To build the necessary binaries, ensure `gcc` is installed, and run `build.sh`.
-
-## Examples
-
-To compute all extremal rays for n=4 and output the results to the
-file `/tmp/ex4-24.txt` with recursive order, use
-`perl base.pl 4 --purge --rec /tmp/ex4`.
-
-To generate all adjacent extremal rays of the Vamos-ray defined in `vamos.txt`
-and output the results to the
-file `/tmp/v-all.txt`, use
-`perl runjob.pl 4 --ray vamos.txt /tmp/v`.
-
 ## Results for N=6
 
 A partial list of 360 billion extremal submodular functions for N=6 is available at
@@ -35,9 +20,19 @@ https://zenodo.org/records/13954788 .
 # Clone the repository
 $ git clone https://github.com/csirmaz/submodular-functions-6.git
 $ cd submodular-functions-6
+
 # Compile the binaries
 $ sudo apt-get install gcc
 $ ./build.sh
+
+# Example 1: Compute all extremal rays for N=4 using recursive order
+$ perl base.pl 4 --purge --rec /tmp/ex4
+# The results will be written to /tmp/ex4-24.txt
+
+# Example 2: Generate all extreml rays adjacent to the Vamos-ray defined
+# in vamos.txt
+$ perl runjob.pl 4 --ray vamos.txt /tmp/v
+# The results will be written to /tmp/v-all.txt
 ```
 
 
