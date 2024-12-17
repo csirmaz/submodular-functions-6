@@ -37,7 +37,7 @@ $ perl runjob.pl 4 --ray vamos.txt /tmp/v
 # Example 3: Continuing from the known N=6 rays in Zenodo, keep searching
 # for neighboring rays. Download the latest rays:
 $ wget https://zenodo.org/records/13954788/files/6rays-26.txt?download=1 -O 6rays-26.txt
-$ perl runjob.pl 6 6rays-1.txt /tmp/out
+$ perl runjob.pl 6 6rays-26.txt /tmp/out
 # The results will be written to /tmp/out-all.txt in a
 # "<weight>: <coordinates>" format.
 ```
