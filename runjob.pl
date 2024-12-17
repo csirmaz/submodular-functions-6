@@ -38,13 +38,23 @@ sub usage {
     print "  --dry     print list of axioms, but do not process\n";
     print "  --ray     generate neighboring rays, not orbits\n";
     print "  rayfile   rays to be probed\n";
-    print "  filestub  result is appended to filesub-all.txt; processed rays to\n";
+    print "  filestub  result is appended to filestub-all.txt; processed rays to\n";
     print "            filestub-probed.txt, and the log to filestub-log.txt\n"; 
-    print "Lines in the rayfile are |<label> <ray>| where label is alphanumeric, and\n";
-    print "ray is a comma-separated list of integers (without space).\n";
-    print "If the file \"<filestub>-skip\" exists, the ray currently processed is skipped;\n";
-    print "if \"<filestub>-stop\" exists, processing is stopped after finishing\n";
-    print "the current ray.\n";
+    print "\n";
+    print "Lines in the rayfile can have the following formats:\n";
+    print "  <label> <weight>: <coordinates>\n";
+    print "  <label> <coordinates>\n";
+    print "  <weight>: <coordinates>\n";
+    print "where <label> optionally starts with '#' and is alphanumeric;\n";
+    print "<weight> is ignored in the input, and\n";
+    print "<coordinates> is a comma-separated list of integers (without space).\n";
+    print "\n";
+    print "Lines in the output file filestub-all.txt has the following format:\n";
+    print "  <weight>: <coordinates>\n";
+    print "\n";
+    print "If the file \"<filestub>-skip\" is created, the ray currently processed is\n";
+    print "skipped; if \"<filestub>-stop\" exists, processing is stopped after\n";
+    print "finishing the current ray.\n";
     exit(0);
 }
 
@@ -983,14 +993,23 @@ sub process_rayfile {
     my $total     = 0;
     read_logfile();
     open(RAYFILE, "<", $rayfile) || die "Cannot open rayfile $rayfile\n";
+    # Formats:
+    # [#]<label> <weight>: <coordinates>
+    # [#]<label> <coordinates>
+    # <weight>: <coordinates>
+    # // -- end processing
     while (<RAYFILE>) {
         my ($label, $ray);
         if (/^\#?(\w+)\s+\d+:\s+([\d,]+)$/) {
             $label = $1;
-            $ray = $2;
+            $ray   = $2;
         }
-        elsif (/^\#?(\w+):?\s+([\d,]+)$/) {
+        elsif (/^\#?(\w+)\s+([\d,]+)$/) {
             $label = $1;
+            $ray   = $2;
+        }
+        elsif (/^(\d+):\s+([\d,]+)$/) {
+            $label = "new" . $total;
             $ray   = $2;
         }
         elsif (m#^//#) {

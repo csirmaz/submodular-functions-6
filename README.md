@@ -29,16 +29,17 @@ $ ./build.sh
 $ perl base.pl 4 --purge --rec /tmp/ex4
 # The results will be written to /tmp/ex4-24.txt
 
-# Example 2: Generate all extreml rays adjacent to the Vamos-ray defined
+# Example 2: Generate all extremal rays adjacent to the Vamos-ray defined
 # in vamos.txt
 $ perl runjob.pl 4 --ray vamos.txt /tmp/v
 # The results will be written to /tmp/v-all.txt
 
 # Example 3: Continuing from the known N=6 rays in Zenodo, keep searching
-# for neighboring rays
-$ wget https://zenodo.org/records/13954788/files/6rays-1.txt?download=1 -O 6rays-1.txt
+# for neighboring rays. Download the latest rays:
+$ wget https://zenodo.org/records/13954788/files/6rays-26.txt?download=1 -O 6rays-26.txt
 $ perl runjob.pl 6 6rays-1.txt /tmp/out
-# The results will be written to /tmp/out-all.txt
+# The results will be written to /tmp/out-all.txt in a
+# "<weight>: <coordinates>" format.
 ```
 
 ## Files
