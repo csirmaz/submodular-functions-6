@@ -5,7 +5,10 @@ This repository contains
 supplementary material for the paper:
 
 E. P. Csirmaz and L. Csirmaz:
-Attempting the impossible: enumerating extremal submodular functions for n=6.
+Attempting the impossible: enumerating extremal submodular functions for n=6
+(in Mathematics, 2025).
+
+The paper is available at https://www.mdpi.com/2227-7390/13/1/97 .
 
 The preprint is available on arXiv at https://arxiv.org/abs/2410.15502 .
 
